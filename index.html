@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webparts360 | Mission Critical Elegance</title>
+    <title>Webparts360 | Midnight Luxe</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -18,162 +19,119 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        obsidian: '#080808',
-                        champagne: '#D4C7B0',
-                        muted: '#2A2A2A',
-                    },
-                    fontFamily: {
-                        serif: ['Cormorant Garamond', 'serif'],
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
+                    colors: { obsidian: '#080808', champagne: '#D4C7B0' },
+                    fontFamily: { serif: ['Cormorant Garamond', 'serif'], sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
                 }
             }
         }
     </script>
 
     <style type="text/css">
-        body { background-color: #080808; color: #D4C7B0; margin: 0; overflow-x: hidden; }
-        .noise {
-            fixed: inset 0;
-            background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-            opacity: 0.05;
-            pointer-events: none;
-            z-index: 100;
-        }
-        .reveal-text { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
-        .soft-glow { filter: drop-shadow(0 0 15px rgba(212, 199, 176, 0.2)); }
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-thumb { background: #D4C7B0; }
+        body { background-color: #080808; color: #D4C7B0; margin: 0; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        .hero-title { opacity: 0; transform: translateY(30px); }
+        .reveal-section { opacity: 0; transform: translateY(20px); }
+        .parallax-wrapper { overflow: hidden; height: 100%; width: 100%; }
+        .parallax-img { transform: scale(1.2); }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useEffect, useRef } = React;
-
-        const Nav = () => (
-            <nav className="fixed top-0 w-full z-[100] border-b border-white/5 backdrop-blur-md bg-obsidian/40 px-10 py-6 flex justify-between items-center">
-                <span className="font-serif italic text-2xl tracking-widest">Webparts360</span>
-                <div className="hidden md:flex gap-12 font-sans text-[10px] tracking-[0.3em] uppercase opacity-60">
-                    <a href="#" className="hover:opacity-100 transition-opacity">Solutions</a>
-                    <a href="#" className="hover:opacity-100 transition-opacity">Philosophy</a>
-                    <a href="#" className="hover:opacity-100 transition-opacity">Contact</a>
-                </div>
-                <button className="text-[10px] tracking-[0.2em] uppercase border-b border-champagne pb-1 hover:opacity-50 transition-all">
-                    Book Consultation
-                </button>
-            </nav>
-        );
+        const { useEffect, useLayoutEffect } = React;
 
         const App = () => {
-            useEffect(() => {
+            // useLayoutEffect ensures this runs AFTER the DOM is painted by React
+            useLayoutEffect(() => {
                 gsap.registerPlugin(ScrollTrigger);
-                
-                // Hero Reveal
-                gsap.from(".hero-title", {
-                    y: 80, opacity: 0, duration: 2, ease: "power4.out", delay: 0.5
+
+                // 1. Hero Entrance
+                const tl = gsap.timeline({ delay: 0.5 });
+                tl.to(".hero-title", {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1.8,
+                    ease: "power4.out",
+                    stagger: 0.3
                 });
 
-                // Parallax Images
+                // 2. Parallax Effect
                 gsap.to(".parallax-img", {
-                    yPercent: -20,
+                    yPercent: -15,
                     ease: "none",
-                    scrollTrigger: { trigger: ".parallax-img", scrub: true }
+                    scrollTrigger: {
+                        trigger: ".hero-section",
+                        start: "top top",
+                        end: "bottom top",
+                        scrub: true
+                    }
                 });
 
-                // Section Reveal
-                gsap.utils.toArray(".reveal-section").forEach(section => {
-                    gsap.from(section, {
-                        opacity: 0, y: 50, duration: 1.5, scrollTrigger: {
-                            trigger: section, start: "top 80%"
+                // 3. Section Reveals
+                gsap.utils.toArray(".reveal-section").forEach((section) => {
+                    gsap.to(section, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 1.2,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 85%",
+                            toggleActions: "play none none none"
                         }
                     });
                 });
             }, []);
 
             return (
-                <div className="font-sans font-light">
-                    <Nav />
+                <main>
+                    {/* Navigation */}
+                    <nav className="fixed top-0 w-full z-[100] border-b border-white/5 backdrop-blur-md bg-obsidian/40 px-10 py-6 flex justify-between items-center">
+                        <span className="font-serif italic text-2xl tracking-widest">Webparts360</span>
+                        <button className="text-[10px] tracking-[0.2em] uppercase border-b border-champagne pb-1">Consultation</button>
+                    </nav>
 
-                    {/* HERO */}
-                    <section className="relative h-screen flex items-center justify-center overflow-hidden">
-                        <div className="absolute inset-0 z-0 scale-110">
-                            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop" 
-                                 className="parallax-img w-full h-full object-cover opacity-30 grayscale" alt="Luxe Texture" />
+                    {/* Hero Section */}
+                    <section className="hero-section relative h-screen flex items-center justify-center overflow-hidden">
+                        <div className="absolute inset-0 z-0 parallax-wrapper">
+                            <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?q=80&w=2070&auto=format&fit=crop" 
+                                 className="parallax-img w-full h-full object-cover opacity-20 grayscale" />
                             <div className="absolute inset-0 bg-gradient-to-b from-obsidian via-transparent to-obsidian" />
                         </div>
-
                         <div className="relative z-10 text-center px-6">
-                            <h2 className="font-mono text-[10px] tracking-[0.6em] uppercase mb-8 opacity-50">Private Instance — Established 2024</h2>
-                            <h1 className="hero-title font-serif text-6xl md:text-[100px] leading-none mb-10 italic">
-                                Orchestrating <br/> <span className="not-italic">The Critical.</span>
+                            <h2 className="hero-title font-mono text-[9px] tracking-[0.6em] uppercase mb-8 opacity-50">Operational Infrastructure</h2>
+                            <h1 className="hero-title font-serif text-6xl md:text-[90px] leading-tight mb-8 italic">
+                                Mission <span className="not-italic">Critical</span> Elegance.
                             </h1>
-                            <p className="max-w-xl mx-auto text-sm md:text-base opacity-60 leading-relaxed font-light tracking-wide">
-                                Webparts360 transforms Microsoft 365 into a high-performance engine. 
-                                We don't build apps; we architect digital heritage.
+                            <p className="hero-title max-w-xl mx-auto text-sm opacity-60 leading-relaxed font-light tracking-wide">
+                                Transforming Microsoft 365 into a high-performance engine for the enterprise.
                             </p>
                         </div>
                     </section>
 
-                    {/* PHILOSOPHY SECTION (The Missing Piece) */}
-                    <section className="reveal-section py-40 px-10 md:px-32 border-y border-white/5 flex flex-col md:flex-row gap-20 items-center">
-                        <div className="md:w-1/2">
-                            <h3 className="font-serif text-4xl italic mb-8">The Philosophy of Absolute Governance.</h3>
-                            <p className="text-sm opacity-50 leading-loose mb-6">
-                                While others settle for generic integration, we demand raw architectural precision. In the Midnight Luxe ecosystem, your mission-critical data remains within the sanctity of your tenant, guarded by the same protocols that protect global finance.
-                            </p>
-                            <div className="font-mono text-[9px] tracking-widest text-champagne/40">PROTOCOL 360-LUXE // SECURE INFRASTRUCTURE</div>
-                        </div>
-                        <div className="md:w-1/2 grid grid-cols-2 gap-4">
-                            <div className="h-64 border border-white/10 p-1"><img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover grayscale opacity-50" /></div>
-                            <div className="h-64 border border-white/10 p-1 mt-12"><img src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop" className="w-full h-full object-cover grayscale opacity-50" /></div>
-                        </div>
-                    </section>
-
-                    {/* VALUE PROPS - THE CARDS */}
-                    <section className="py-40 px-6 md:px-20 bg-obsidian">
-                        <div className="grid md:grid-cols-3 gap-16">
-                            <div className="reveal-section group">
-                                <div className="font-serif italic text-4xl mb-6 opacity-30 group-hover:opacity-100 transition-opacity">01</div>
-                                <h4 className="text-xl mb-4 tracking-tighter font-semibold">Automate Teams</h4>
-                                <p className="text-xs opacity-40 leading-relaxed uppercase tracking-widest">
-                                    Reactive workflows deployed into the Teams heartbeat with silent, surgical efficiency.
-                                </p>
-                            </div>
-                            <div className="reveal-section group">
-                                <div className="font-serif italic text-4xl mb-6 opacity-30 group-hover:opacity-100 transition-opacity">02</div>
-                                <h4 className="text-xl mb-4 tracking-tighter font-semibold">SharePoint Mastery</h4>
-                                <p className="text-xs opacity-40 leading-relaxed uppercase tracking-widest">
-                                    Bespoke interfaces that defy the limitations of standard portals. Pure utility meets editorial design.
-                                </p>
-                            </div>
-                            <div className="reveal-section group">
-                                <div className="font-serif italic text-4xl mb-6 opacity-30 group-hover:opacity-100 transition-opacity">03</div>
-                                <h4 className="text-xl mb-4 tracking-tighter font-semibold">Tenant Security</h4>
-                                <p className="text-xs opacity-40 leading-relaxed uppercase tracking-widest">
-                                    Data sovereignty is not a feature; it is the foundation. Every bit remains within your perimeter.
-                                </p>
-                            </div>
+                    {/* Features */}
+                    <section className="py-40 px-6 md:px-20 bg-obsidian border-t border-white/5">
+                        <div className="grid md:grid-cols-3 gap-20">
+                            {["Automate Teams", "SharePoint Mastery", "Tenant Security"].map((title, i) => (
+                                <div key={i} className="reveal-section">
+                                    <div className="font-serif italic text-3xl mb-6 opacity-20">0{i+1}</div>
+                                    <h4 className="text-xl mb-4 font-semibold tracking-tighter">{title}</h4>
+                                    <p className="text-xs opacity-40 leading-relaxed uppercase tracking-[0.2em]">
+                                        Refining the core logic of your digital workspace with surgical precision.
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     </section>
 
-                    {/* FINAL CTA SECTION */}
-                    <section className="reveal-section h-[70vh] flex flex-col items-center justify-center border-t border-white/5 relative">
-                        <div className="absolute top-0 w-[1px] h-32 bg-gradient-to-b from-champagne to-transparent" />
-                        <h2 className="font-serif text-5xl italic mb-12">Begin the Consultation.</h2>
-                        <button className="soft-glow group relative px-12 py-5 border border-champagne overflow-hidden transition-all">
-                            <span className="relative z-10 font-sans text-[10px] tracking-[0.4em] uppercase group-hover:text-obsidian transition-colors">Initialize Connection</span>
-                            <div className="absolute inset-0 bg-champagne translate-y-[101%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                    {/* Footer CTA */}
+                    <section className="reveal-section h-[60vh] flex flex-col items-center justify-center border-t border-white/5">
+                        <h2 className="font-serif text-4xl italic mb-10">Secure Your Instance.</h2>
+                        <button className="px-12 py-5 border border-champagne text-[10px] tracking-[0.4em] uppercase hover:bg-champagne hover:text-obsidian transition-all duration-500">
+                            Book a consultation
                         </button>
                     </section>
-
-                    <footer className="py-20 text-center opacity-20 font-mono text-[9px] tracking-[1em] uppercase">
-                        Webparts360 &copy; 2026 // Digital Transformation Framework
-                    </footer>
-                </div>
+                </main>
             );
         };
 
